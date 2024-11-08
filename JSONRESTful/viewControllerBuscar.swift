@@ -18,6 +18,11 @@ class viewControllerBuscar: UIViewController, UITableViewDelegate, UITableViewDa
         cell.detailTextLabel?.text = "Genero: \(peliculas[indexPath.row].genero) Duracion: \(peliculas[indexPath.row].duracion)"
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let pelicula = peliculas[indexPath.row]
+        performSegue(withIdentifier: "segueEditar", sender: pelicula)
+    }
         
     var peliculas = [Peliculas]()
     
@@ -81,6 +86,52 @@ class viewControllerBuscar: UIViewController, UITableViewDelegate, UITableViewDa
     
     @IBAction func btnSalir(_ sender: Any) {
         dismiss(animated: true, completion: nil)
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        let ruta = "http://localhost:3000/peliculas/"
+        cargarPeliculas(ruta: ruta){
+            self.tablaPeliculas.reloadData()
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "segueEditar" {
+            let siguienteVC = segue.destination as! viewControllerAgregar
+            siguienteVC.pelicula = sender as? Peliculas
+        }
+    }
+    
+    // Método para manejar el estilo de edición (eliminar)
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            // Mostrar alerta de confirmación antes de eliminar
+            let pelicula = peliculas[indexPath.row]
+            mostrarAlertaConfirmacion(pelicula: pelicula, indexPath: indexPath)
+        }
+    }
+    // Método para mostrar la alerta de confirmación
+    func mostrarAlertaConfirmacion(pelicula: Peliculas, indexPath: IndexPath) {
+        let alerta = UIAlertController(title: "Eliminar Película", message: "¿Deseas eliminar la película '\(pelicula.nombre)'?", preferredStyle: .alert)
+        // Acción de "Sí" para confirmar eliminación
+        let accionSi = UIAlertAction(title: "Sí", style: .destructive) { _ in
+            self.eliminarPelicula(indexPath: indexPath)
+        }
+        // Acción de "No" para cancelar
+        let accionNo = UIAlertAction(title: "No", style: .cancel, handler: nil)
+        // Agregar acciones a la alerta
+        alerta.addAction(accionSi)
+        alerta.addAction(accionNo)
+        // Mostrar alerta
+        present(alerta, animated: true, completion: nil)
+    }
+    // Método para eliminar la película de la lista local
+    func eliminarPelicula(indexPath: IndexPath) {
+        peliculas.remove(at: indexPath.row)
+        tablaPeliculas.deleteRows(at: [indexPath], with: .automatic)
+    }
+    
+    @IBAction func irAEditarPerfil(_ sender: Any) {
+        performSegue(withIdentifier: "segueEditarPerfil", sender: nil)
     }
     
 }

@@ -29,6 +29,16 @@ class ViewController: UIViewController {
                     print ("Nombre de usuario y/o contraseña es incorrecto")
             }else{
                 print ("Logeo Exitoso")
+                
+                // Guardar los datos del usuario en UserDefaults
+                for data in self.users {
+                let usuarioLogeado: [String: Any] = [
+                    "id": data.id,
+                    "nombre": data.nombre,
+                    "email": data.email
+                ]// Almacenar el diccionario en UserDefaults
+                    UserDefaults.standard.set(usuarioLogeado, forKey: "usuarioLogeado")
+                
                 self.performSegue(withIdentifier: "segueLogeo", sender: nil)
                 for data in self.users{
                     print("id: \(data.id), nombre: \(data.nombre), nombre: \(data.email)")
@@ -36,8 +46,7 @@ class ViewController: UIViewController {
             }
         }
     }
-    
-    
+        
     func validarUsuario(ruta:String, completed: @escaping () -> ()){
         let url = URL(string: ruta)
         URLSession.shared.dataTask(with:url!){(data,response, error) in
@@ -54,6 +63,8 @@ class ViewController: UIViewController {
         }.resume()
     }
     
+    
+}
     
 }
 

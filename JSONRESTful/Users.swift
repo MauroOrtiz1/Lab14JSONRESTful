@@ -6,7 +6,7 @@
 //
 
 import Foundation
-struct Users:Decodable{
+struct Users:Decodable, Encodable{
     let id:Int
     let nombre: String
     let clave:String
